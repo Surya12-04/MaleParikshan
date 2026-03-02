@@ -1,193 +1,256 @@
-import { useState, useRef, useEffect } from "react"
-import { chatService } from "../services/chatService"
-import type { ChatMessage } from "../types"
-import { useTranslation } from "../hooks/useTranslation"
+import React, { useState, useRef, useEffect } from "react";
 
-const SUGGESTIONS = [
-  "How to improve sleep quality?",
-  "What is NoFap and its benefits?",
-  "Tips for managing stress and anxiety",
-  "How to build a morning routine?",
-]
+interface Message {
+  role: "user" | "ai";
+  content: string;
+}
 
-export default function ChatPage() {
-  const { t } = useTranslation()
-  const [messages, setMessages] = useState<ChatMessage[]>([])
-  const [input, setInput] = useState("")
-  const [loading, setLoading] = useState(false)
-  const bottomRef = useRef<HTMLDivElement>(null)
-  const inputRef = useRef<HTMLInputElement>(null)
+const ChatPage = () => {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [language, setLanguage] = useState<"english" | "hindi">("english");
 
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  /* ================= AUTO SCROLL ================= */
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [messages])
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
-  const sendMessage = async (text: string) => {
-    if (!text.trim() || loading) return
+  /* ================= FIXED STREAM FUNCTION ================= */
+  const sendMessage = async () => {
+    if (!input.trim() || loading) return;
 
-    const userMsg: ChatMessage = {
-      id: Date.now().toString(),
-      role: "user",
-      content: text,
-      createdAt: new Date().toISOString(),
-    }
+    const userMessage = input;
+    setInput("");
+    setLoading(true);
 
-    setMessages((prev) => [...prev, userMsg])
-    setInput("")
-    setLoading(true)
+    setMessages((prev) => [
+      ...prev,
+      { role: "user", content: userMessage },
+      { role: "ai", content: "" },
+    ]);
 
     try {
-      const res = await chatService.send(text)
+      const formData = new FormData();
+      formData.append("message", userMessage);
+      formData.append("language", language);
 
-      // ✅ FIXED: use res.response (NOT res.message)
-      const assistantMsg: ChatMessage = {
-        id: Date.now().toString(),
-        role: "assistant",
-        content: res.response,
-        createdAt: new Date().toISOString(),
+      if (selectedFile) {
+        formData.append("file", selectedFile);
       }
 
-      setMessages((prev) => [...prev, assistantMsg])
-    } catch {
-      const errorMsg: ChatMessage = {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        content: "Sorry, I encountered an error. Please try again.",
-        createdAt: new Date().toISOString(),
+      const response = await fetch("http://localhost:5000/chat", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+        body: formData,
+      });
+
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder("utf-8");
+
+      let aiText = "";
+
+      while (true) {
+        const { done, value } = await reader!.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+
+        // Proper SSE splitting
+        const events = chunk.split("\n\n");
+
+        for (let event of events) {
+          if (!event.startsWith("data:")) continue;
+
+          const data = event.replace("data:", "").trim();
+
+          if (data === "[DONE]") {
+            setLoading(false);
+            return;
+          }
+
+          aiText += data;
+
+          setMessages((prev) => {
+            const updated = [...prev];
+            updated[updated.length - 1] = {
+              role: "ai",
+              content: aiText,
+            };
+            return updated;
+          });
+        }
       }
-
-      setMessages((prev) => [...prev, errorMsg])
-    } finally {
-      setLoading(false)
-      inputRef.current?.focus()
+    } catch (err) {
+      console.error("Stream error:", err);
+      setLoading(false);
     }
-  }
+  };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault()
-      sendMessage(input)
+  /* ================= SMART AUDIO ================= */
+  const speak = (text: string) => {
+    window.speechSynthesis.cancel();
+
+    const cleaned = text.replace(/[*#_`~]/g, "");
+
+    const utterance = new SpeechSynthesisUtterance(cleaned);
+
+    const voices = window.speechSynthesis.getVoices();
+
+    const selectedVoice =
+      language === "hindi"
+        ? voices.find((v) => v.lang.includes("hi"))
+        : voices.find((v) => v.lang.includes("en"));
+
+    if (selectedVoice) {
+      utterance.voice = selectedVoice;
     }
-  }
 
+    utterance.lang = language === "hindi" ? "hi-IN" : "en-US";
+
+    window.speechSynthesis.speak(utterance);
+  };
+
+  const pause = () => window.speechSynthesis.pause();
+  const resume = () => window.speechSynthesis.resume();
+  const stop = () => window.speechSynthesis.cancel();
+
+  useEffect(() => {
+    window.speechSynthesis.getVoices();
+  }, []);
+
+  /* ================= UI ================= */
   return (
-    <div className="flex flex-col h-[calc(100vh-64px)] animate-fade-up">
-      <div className="mb-6">
-        <h1 className="font-display text-3xl font-bold text-white mb-2">
-          {t("chat.title")}
-        </h1>
-        <p className="text-muted font-body text-sm">
-          Ask anything about men's health, wellness, and habits
-        </p>
+    <div
+      style={{
+        background: "#0b0f1a",
+        height: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        color: "white",
+      }}
+    >
+      {/* LANGUAGE SELECTOR */}
+      <div style={{ padding: "15px", borderBottom: "1px solid #222" }}>
+        <label style={{ marginRight: "10px" }}>Language:</label>
+        <select
+          value={language}
+          onChange={(e) =>
+            setLanguage(e.target.value as "english" | "hindi")
+          }
+          style={{
+            padding: "6px 10px",
+            borderRadius: "8px",
+            background: "#1f2437",
+            color: "white",
+            border: "none",
+          }}
+        >
+          <option value="english">English</option>
+          <option value="hindi">Hindi</option>
+        </select>
       </div>
 
-      <div className="flex-1 overflow-y-auto space-y-4 mb-4 pr-2">
-        {messages.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full gap-6 py-12">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-accent/20 to-gold/20 border border-accent/20 flex items-center justify-center text-3xl">
-              ◐
-            </div>
-            <div className="text-center">
-              <p className="font-display text-lg font-semibold text-white mb-2">
-                AI Health Assistant
-              </p>
-              <p className="text-muted font-body text-sm max-w-sm">
-                Ask me anything about men's health, nutrition, mental wellness,
-                habits, and more.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-2 max-w-md w-full">
-              {SUGGESTIONS.map((s) => (
-                <button
-                  key={s}
-                  onClick={() => sendMessage(s)}
-                  className="text-left p-3 rounded-xl bg-elevated border border-border hover:border-accent/30 text-muted hover:text-white text-xs font-body transition-all duration-200"
-                >
-                  {s}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {messages.map((msg) => (
+      {/* CHAT AREA */}
+      <div style={{ flex: 1, padding: "20px", overflowY: "auto" }}>
+        {messages.map((msg, index) => (
           <div
-            key={msg.id}
-            className={`flex ${
-              msg.role === "user" ? "justify-end" : "justify-start"
-            } animate-fade-in`}
+            key={index}
+            style={{
+              marginBottom: "20px",
+              display: "flex",
+              justifyContent:
+                msg.role === "user" ? "flex-end" : "flex-start",
+            }}
           >
-            {msg.role === "assistant" && (
-              <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent/20 to-gold/20 border border-accent/20 flex items-center justify-center text-xs mr-3 flex-shrink-0 mt-1">
-                ◐
-              </div>
-            )}
-
             <div
-              className={`max-w-[70%] rounded-2xl px-4 py-3 font-body text-sm leading-relaxed ${
-                msg.role === "user"
-                  ? "bg-accent text-white rounded-tr-sm"
-                  : "bg-elevated border border-border text-white/85 rounded-tl-sm"
-              }`}
+              style={{
+                background:
+                  msg.role === "user" ? "#ff7a00" : "#1f2437",
+                padding: "14px 18px",
+                borderRadius: "18px",
+                maxWidth: "65%",
+                whiteSpace: "pre-wrap",
+                lineHeight: "1.6",
+              }}
             >
               {msg.content}
-              <p
-                className={`text-xs mt-1.5 ${
-                  msg.role === "user" ? "text-white/50" : "text-muted"
-                }`}
-              >
-                {new Date(msg.createdAt).toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </p>
+
+              {msg.role === "ai" && msg.content && (
+                <div
+                  style={{
+                    marginTop: "10px",
+                    display: "flex",
+                    gap: "10px",
+                  }}
+                >
+                  <button onClick={() => speak(msg.content)}>🔊</button>
+                  <button onClick={pause}>⏸</button>
+                  <button onClick={resume}>▶</button>
+                  <button onClick={stop}>❌</button>
+                </div>
+              )}
             </div>
           </div>
         ))}
 
         {loading && (
-          <div className="flex justify-start animate-fade-in">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-accent/20 to-gold/20 border border-accent/20 flex items-center justify-center text-xs mr-3 flex-shrink-0">
-              ◐
-            </div>
-            <div className="bg-elevated border border-border rounded-2xl rounded-tl-sm px-4 py-3">
-              <div className="flex gap-1 items-center h-5">
-                {[0, 1, 2].map((i) => (
-                  <div
-                    key={i}
-                    className="w-1.5 h-1.5 bg-muted rounded-full animate-pulse2"
-                    style={{ animationDelay: `${i * 0.2}s` }}
-                  />
-                ))}
-              </div>
-            </div>
-          </div>
+          <div style={{ opacity: 0.6 }}>AI is typing...</div>
         )}
 
-        <div ref={bottomRef} />
+        <div ref={messagesEndRef} />
       </div>
 
-      <div className="bg-elevated border border-border rounded-2xl p-2 flex gap-2">
+      {/* INPUT AREA */}
+      <div
+        style={{
+          padding: "15px",
+          borderTop: "1px solid #222",
+          display: "flex",
+          gap: "10px",
+          alignItems: "center",
+        }}
+      >
         <input
-          ref={inputRef}
           type="text"
+          placeholder="Ask something..."
           value={input}
           onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder={t("chat.placeholder")}
-          disabled={loading}
-          className="flex-1 bg-transparent px-3 py-2.5 text-white placeholder-muted font-body text-sm focus:outline-none"
+          style={{
+            flex: 1,
+            padding: "12px",
+            borderRadius: "12px",
+            border: "none",
+            outline: "none",
+            background: "#1f2437",
+            color: "white",
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") sendMessage();
+          }}
         />
 
         <button
-          onClick={() => sendMessage(input)}
-          disabled={!input.trim() || loading}
-          className="btn-primary px-5 py-2.5 text-sm disabled:opacity-40 disabled:cursor-not-allowed"
+          onClick={sendMessage}
+          style={{
+            background: "#ff7a00",
+            color: "white",
+            border: "none",
+            padding: "12px 18px",
+            borderRadius: "12px",
+            cursor: "pointer",
+          }}
         >
-          {t("chat.send")}
+          Send
         </button>
       </div>
     </div>
-  )
-}
+  );
+};
+
+export default ChatPage;
