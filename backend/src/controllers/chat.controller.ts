@@ -1,227 +1,122 @@
-import { Response, NextFunction } from "express";
-import { z } from "zod";
+import { Response } from "express";
 import { prisma } from "../config/prisma";
-import { sendSuccess, sendError } from "../utils/response";
 import { AuthRequest } from "../middleware/auth";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import Groq from "groq-sdk";
 
-/* ================================
-   GEMINI INIT
-================================ */
-
-if (!process.env.GEMINI_API_KEY) {
-  throw new Error("GEMINI_API_KEY is not defined");
-}
-
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
-
-/* ================================
-   VALIDATION
-================================ */
-
-const chatSchema = z.object({
-  message: z.string().min(1).max(1000),
-  mode: z.enum(["normal", "adult"]).default("normal"),
+const groq = new Groq({
+  apiKey: process.env.GROQ_API_KEY!,
 });
 
-/* ================================
-   SAFETY FILTER
+/* ===============================
+   SMART AUTO LANGUAGE PROMPT
 ================================ */
 
-const explicitPatterns =
-  /(how to have sex|sexual positions|explicit|porn link|nude)/i;
+const buildSystemPrompt = () => {
+  return `
+You are Male Parikshan AI — a modern men's health assistant.
 
-const illegalPatterns =
-  /(rape|child porn|minor sex|how to assault)/i;
+IMPORTANT LANGUAGE RULE:
 
-const selfHarmPatterns =
-  /(suicide|kill myself|self harm|cutting)/i;
+1. Detect the language of the user's message.
+2. If user writes in Hindi → respond fully in Hindi.
+3. If user writes in English → respond fully in English.
+4. If user writes in Hinglish (mixed) → respond naturally in Hinglish.
+5. Never force a language.
 
-const isBlocked = (message: string): boolean => {
-  return (
-    explicitPatterns.test(message) ||
-    illegalPatterns.test(message) ||
-    selfHarmPatterns.test(message)
-  );
-};
-
-const safeRedirect =
-  "I can’t assist with explicit or harmful content. Male Parikshan focuses on responsible, educational guidance about men’s health, discipline, and emotional strength.";
-
-/* ================================
-   PROMPT BUILDER
-================================ */
-
-const buildSystemPrompt = (mode: "normal" | "adult") => {
-  const base = `
-You are Male Parikshan AI — an educational men's health assistant.
-
-Tone:
-- Calm
-- Masculine
-- Disciplined
-- Respectful
-- Non-judgmental
-
-STRICT RULES:
-- No explicit sexual techniques
-- No graphic descriptions
-- No medical diagnosis
-- No illegal advice
-- Redirect harmful content
+STYLE RULES:
+• Keep responses clean and well spaced.
+• Use proper paragraphs.
+• Do NOT use markdown symbols like ** or ##.
+• Keep tone respectful and confident.
 `;
-
-  if (mode === "adult") {
-    return (
-      base +
-      `
-Adult Mode:
-- Consent education
-- Porn vs reality awareness
-- Emotional accountability
-- Impulse control
-- Still no explicit details
-`
-    );
-  }
-
-  return (
-    base +
-    `
-Normal Mode:
-- Hygiene education
-- Sleep health
-- Emotional strength
-- Discipline and self-control
-`
-    );
 };
 
-/* ================================
-   GEMINI CALL (FIXED CORRECTLY)
+/* ===============================
+   STREAM CHAT
 ================================ */
 
-const generateAIResponse = async (
-  message: string,
-  mode: "normal" | "adult"
-): Promise<string> => {
-  try {
-    const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash",
-      systemInstruction: buildSystemPrompt(mode),
-    });
-
-    const result = await model.generateContent(message);
-
-    return result.response.text().trim();
-  } catch (error) {
-    console.error("Gemini Error:", error);
-    return "I'm currently unable to respond. Please try again later.";
-  }
-};
-
-/* ================================
-   CHAT CONTROLLER
-================================ */
-
-export const chat = async (
-  req: AuthRequest,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
+export const chat = async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user) {
-      sendError(res, "Unauthorized", 401);
-      return;
+      return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const userId = req.user.userId;
+    const message = req.body.message;
+    const file = req.file;
 
-    const user = await prisma.user.findUnique({
-      where: { id: userId },
+    if (!message) {
+      return res.status(400).json({ message: "Message is required" });
+    }
+
+    let fileNote = "";
+    if (file) {
+      fileNote = `User attached file: ${file.originalname}`;
+    }
+
+    /* STREAM HEADERS */
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+    res.flushHeaders();
+
+    const stream = await groq.chat.completions.create({
+      model: "llama-3.1-8b-instant",
+      messages: [
+        { role: "system", content: buildSystemPrompt() },
+        { role: "user", content: `${fileNote}\n${message}` },
+      ],
+      stream: true,
     });
 
-    if (!user) {
-      sendError(res, "User not found", 404);
-      return;
-    }
+    let fullResponse = "";
 
-    const { message, mode } = chatSchema.parse(req.body);
+    for await (const chunk of stream) {
+      const content = chunk.choices[0]?.delta?.content;
 
-    /* -------- Adult Mode Gate -------- */
-    if (mode === "adult") {
-      if (!user.age || user.age < 18 || !user.adultModeEnabled) {
-        sendError(res, "Adult mode not permitted.", 403);
-        return;
+      if (content) {
+        fullResponse += content;
+        res.write(`data: ${content}\n\n`);
       }
     }
 
-    /* -------- Safety Filter -------- */
-    if (isBlocked(message)) {
-      const log = await prisma.chatLog.create({
-        data: { userId, message, response: safeRedirect },
-      });
-
-      sendSuccess(
-        res,
-        {
-          message: log.message,
-          response: log.response,
-          timestamp: log.timestamp,
-        },
-        "Safe response generated"
-      );
-      return;
-    }
-
-    /* -------- Gemini Generation -------- */
-    const aiResponse = await generateAIResponse(message, mode);
-
-    /* -------- Store in DB -------- */
-    const log = await prisma.chatLog.create({
-      data: { userId, message, response: aiResponse },
+    await prisma.chatLog.create({
+      data: {
+        userId: req.user.userId,
+        message,
+        response: fullResponse,
+      },
     });
 
-    sendSuccess(
-      res,
-      {
-        message: log.message,
-        response: log.response,
-        timestamp: log.timestamp,
-      },
-      "Response generated"
-    );
-  } catch (err) {
-    next(err);
+    res.write("data: [DONE]\n\n");
+    res.end();
+  } catch (error) {
+    console.error("STREAM ERROR:", error);
+    res.write("data: ⚠️ AI Error\n\n");
+    res.write("data: [DONE]\n\n");
+    res.end();
   }
 };
 
-/* ================================
+/* ===============================
    CHAT HISTORY
 ================================ */
 
 export const getChatHistory = async (
   req: AuthRequest,
-  res: Response,
-  next: NextFunction
-): Promise<void> => {
+  res: Response
+) => {
   try {
     if (!req.user) {
-      sendError(res, "Unauthorized", 401);
-      return;
+      return res.status(401).json({ message: "Unauthorized" });
     }
 
-    const userId = req.user.userId;
-
-    const logs = await prisma.chatLog.findMany({
-      where: { userId },
-      orderBy: { timestamp: "desc" },
-      take: 50,
-      select: { message: true, response: true, timestamp: true },
+    const history = await prisma.chatLog.findMany({
+      where: { userId: req.user.userId },
+      orderBy: { timestamp: "asc" },
     });
 
-    sendSuccess(res, logs, "Chat history fetched");
-  } catch (err) {
-    next(err);
+    res.json(history);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch history" });
   }
 };
