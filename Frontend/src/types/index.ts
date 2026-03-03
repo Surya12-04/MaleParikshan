@@ -26,7 +26,8 @@ export interface Streak {
   currentStreak: number
   longestStreak: number
   targetDays: number
-  lastCheckDate?: string   // ← fixed: was lastCheckinDate
+  lastCheckDate?: string   // ISO date string
+  checkins?: { id: string; option: 'stayed_consistent' | 'resisted_urges' | 'relapsed'; date: string }[]
   createdAt: string
   updatedAt: string
 }
@@ -55,6 +56,7 @@ export interface Module {
   category: string
   isAdultOnly: boolean
   order: number
+  imageUrl?: string
   progress?: { completed: boolean; completedAt?: string }[]
 }
 

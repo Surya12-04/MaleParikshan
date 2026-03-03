@@ -1,72 +1,87 @@
 import { PrismaClient } from '@prisma/client';
-
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Seeding database...');
+  console.log('🌱 Seeding Male Parikshan modules...');
 
-  // Seed sample modules
   const modules = [
-    {
-      title: 'Understanding Male Anatomy',
-      description: 'A comprehensive guide to male reproductive and overall health.',
-      category: 'Fundamentals',
-      isAdultOnly: false,
-      order: 1,
-    },
-    {
-      title: 'Hormones & Testosterone',
-      description: 'Learn how hormones affect your mood, energy, and health.',
-      category: 'Hormones',
-      isAdultOnly: false,
-      order: 2,
-    },
-    {
-      title: 'Mental Health for Men',
-      description: 'Breaking the stigma around men\'s mental health.',
-      category: 'Mental Health',
-      isAdultOnly: false,
-      order: 3,
-    },
-    {
-      title: 'Fitness & Nutrition',
-      description: 'Evidence-based exercise and diet guidance for men.',
-      category: 'Lifestyle',
-      isAdultOnly: false,
-      order: 4,
-    },
-    {
-      title: 'Sleep & Recovery',
-      description: 'How to optimize sleep for peak health performance.',
-      category: 'Lifestyle',
-      isAdultOnly: false,
-      order: 5,
-    },
-    {
-      title: 'Sexual Health Education',
-      description: 'Adult-only comprehensive sexual health and wellness module.',
-      category: 'Sexual Health',
-      isAdultOnly: true,
-      order: 6,
-    },
-  ];
+    // ── NORMAL: MENTAL HEALTH ─────────────────────────────────────────────────
+    { title: '📊 Male Suicide Reality in India', description: 'In 2022, the suicide ratio in India was approximately 72% male and 27% female.\nUntreated mental illness accounts for nearly 50% of suicides.\nDespite women reporting higher depression rates, men are significantly more likely to die by suicide.\n\n(Source: Singh, 2022; Albert, 2015; Murphy, 1998)\n\nWhy This Matters:\nSilence does not mean strength. It may mean risk.', category: 'Mental Health', isAdultOnly: false, order: 1 },
+    { title: 'What is Restrictive Emotionality?', description: 'Restrictive Emotionality (RE) refers to the social conditioning of men to avoid expressing strong emotions.\nIt includes suppressing sadness, fear, vulnerability, or distress to avoid appearing weak.\n\n(Cohn et al., 2009)', category: 'Mental Health', isAdultOnly: false, order: 2 },
+    { title: 'How Common Is Emotional Restriction?', description: 'The study found that Indian married men (30–45 years) showed a moderate level of restrictive emotionality.\nThis means emotional suppression is neither rare nor extreme — it is culturally normalized.\n\n(Quantitative results, Table 1)', category: 'Mental Health', isAdultOnly: false, order: 3 },
+    { title: 'Does Emotional Restriction Increase Suicide Risk?', description: 'Yes.\nMen reporting high restrictive emotionality were:\n• Twice as likely to report suicide attempts\n• Three times more likely to report serious suicidal thoughts\n\n(Jacobson et al., 2010)', category: 'Mental Health', isAdultOnly: false, order: 4 },
+    { title: "Why Don't Men Express Emotions?", description: 'The study identified major reasons:\n\n• Fear of negative labels\n• Pressure to appear strong\n• Belief that sharing is time-consuming\n• Responsibility as family problem-solver\n• Cultural upbringing differences\n\n(Thematic Analysis)', category: 'Mental Health', isAdultOnly: false, order: 5 },
+    { title: '"Men Don\'t Cry" — Myth or Belief?', description: 'Most participants disagreed with the statement.\nHowever, some believed society expects men not to cry — even if they personally disagree.\n\n(Stereotype Theme)', category: 'Mental Health', isAdultOnly: false, order: 6 },
 
+    // ── NORMAL: COPING ────────────────────────────────────────────────────────
+    { title: 'How Do Men Cope with Distress?', description: 'Two main patterns were observed:\n\nProblem-oriented coping\n\nEmotional avoidance or distraction\n\nMen often attempt to solve problems internally before seeking support.', category: 'Coping Mechanisms', isAdultOnly: false, order: 7 },
+    { title: 'Healthy Coping Strategies Identified', description: 'Some participants used:\n\n• Recreational activities\n• Talking to trusted individuals\n• Reflective thinking\n• Physical engagement (sports, photography)', category: 'Coping Mechanisms', isAdultOnly: false, order: 8 },
+    { title: 'Unhealthy Coping Patterns', description: 'Some men:\n\n• Suppress emotions\n• Distract themselves excessively\n• Avoid discussing distress\n• Self-blame\n\nAvoidance may reduce short-term discomfort but increases long-term stress.', category: 'Coping Mechanisms', isAdultOnly: false, order: 9 },
+
+    // ── NORMAL: CULTURE ───────────────────────────────────────────────────────
+    { title: 'Does Parenting Influence Emotional Expression?', description: 'Yes.\n\nMen who reported emotional closeness with parents showed lower restrictive emotionality.\nParticipants also reported unequal emotional encouragement between sons and daughters.', category: 'Culture & Upbringing', isAdultOnly: false, order: 10 },
+    { title: 'Masculinity Pressure Factors', description: 'Four cultural drivers linked to restrictive emotionality:\n\n• Autonomy\n• Achievement\n• Aggression\n• Stoicism\n\nEmotional control is often framed as masculine strength.\n\n(Levant, 1995)', category: 'Culture & Upbringing', isAdultOnly: false, order: 11 },
+    { title: 'Role of Cultural Expectations', description: 'Participants reported:\n\n• Being raised to "stay strong"\n• Being seen as family problem-solvers\n• Fear of appearing incapable\n\nCultural norms reinforce emotional restraint.', category: 'Culture & Upbringing', isAdultOnly: false, order: 12 },
+
+    // ── NORMAL: HELP-SEEKING ──────────────────────────────────────────────────
+    { title: "Why Don't Men Seek Professional Help?", description: 'Common reasons identified:\n\n• Fear of being seen as weak\n• Time constraints\n• Confidentiality concerns\n• Belief they can handle it alone\n• Inability to acknowledge distress', category: 'Help-Seeking', isAdultOnly: false, order: 13 },
+    { title: 'Who Do Men Prefer to Talk To?', description: 'Most participants said:\n\n• Spouse\n• Trusted close circle\n\nVery few preferred professional help initially.', category: 'Help-Seeking', isAdultOnly: false, order: 14 },
+    { title: 'Does Restrictive Emotionality Reduce Help-Seeking?', description: 'Yes.\n\nIf men are uncomfortable expressing distress to friends or family, they are even less likely to seek professional support.\n\nConclusion of study', category: 'Help-Seeking', isAdultOnly: false, order: 15 },
+
+    // ── NORMAL: SUPPORT & CHANGE ──────────────────────────────────────────────
+    { title: 'How Do Men Want Support?', description: 'Participants preferred:\n\n• Being heard without judgment\n• Verbal reassurance\n• Emotional validation\n• Sometimes physical comfort (rarely expressed openly)', category: 'Support & Change', isAdultOnly: false, order: 16 },
+    { title: 'What Needs to Change?', description: 'The study recommends:\n\n• Awareness of benefits of emotional expression\n• Changing stigma around seeking help\n• Positive media portrayal of expressive men\n• Peer encouragement', category: 'Support & Change', isAdultOnly: false, order: 17 },
+    { title: 'Reflection Question', description: 'If society never asked men how they feel —\nhave you ever asked yourself?\n\n\nTake a moment. No performance. No judgment.\n\nHow are you, really?', category: 'Support & Change', isAdultOnly: false, order: 18 },
+
+    // ── ADULT: CONSENT CLARITY ────────────────────────────────────────────────
+    { title: 'What is Consent?', description: 'Consent is a clear, voluntary, and informed agreement between adults.\n\nIt must be:\n• Freely given\n• Reversible\n• Specific\n• Enthusiastic\n• Ongoing\n\nSilence is not consent.\nAssumption is not consent.', category: 'Consent Clarity', isAdultOnly: true, order: 1 },
+    { title: "If Someone Doesn't Say \"No,\" Is It Consent?", description: 'No.\n\nConsent requires a clear "yes."\nLack of resistance does not mean agreement.\nFear, pressure, or confusion invalidate consent.\n\nThe absence of "no" is not the presence of "yes."', category: 'Consent Clarity', isAdultOnly: true, order: 2 },
+    { title: 'Can Consent Be Withdrawn?', description: 'Yes.\n\nConsent can be withdrawn at any time.\nIf one person changes their mind, the interaction must stop immediately.\n\nRespecting this builds trust.\nIgnoring it causes harm.', category: 'Consent Clarity', isAdultOnly: true, order: 3 },
+    { title: 'Does Relationship Status Guarantee Consent?', description: 'No.\n\nMarriage or dating does not automatically mean consent.\nEvery interaction requires mutual willingness.\n\nRespect does not expire inside relationships.', category: 'Consent Clarity', isAdultOnly: true, order: 4 },
+
+    // ── ADULT: IMPULSE & SELF-CONTROL ─────────────────────────────────────────
+    { title: 'Why Do Urges Feel Strong Sometimes?', description: 'Sexual impulses are influenced by dopamine — the brain\'s reward chemical.\n\nTriggers include:\n• Visual stimulation\n• Stress\n• Loneliness\n• Boredom\n\nUrges are biological.\nActions are choices.', category: 'Impulse & Self-Control', isAdultOnly: true, order: 5 },
+    { title: 'What Is Impulse Control?', description: 'Impulse control is the ability to pause between desire and action.\n\nStrong men are not those who act instantly.\nStrong men regulate.\n\nThe brain strengthens self-control through repeated discipline.', category: 'Impulse & Self-Control', isAdultOnly: true, order: 6 },
+    { title: 'Does Porn Represent Reality?', description: 'No.\n\nPornography is scripted, edited, exaggerated content created for performance — not real-life intimacy.\n\nRepeated exposure may:\n• Distort expectations\n• Reduce satisfaction\n• Increase comparison anxiety\n\nAwareness protects perception.', category: 'Impulse & Self-Control', isAdultOnly: true, order: 7 },
+    { title: 'Can Excessive Porn Use Affect the Brain?', description: 'Yes.\n\nFrequent exposure can:\n• Increase dopamine tolerance\n• Reduce sensitivity to natural rewards\n• Create compulsive patterns\n\nBalance protects mental clarity.', category: 'Impulse & Self-Control', isAdultOnly: true, order: 8 },
+
+    // ── ADULT: EMOTIONAL ACCOUNTABILITY ──────────────────────────────────────
+    { title: 'Is Anger a Justification for Harm?', description: 'No.\n\nAnger explains emotion — not behavior.\n\nEmotional maturity means:\n• Feeling anger\n• Pausing\n• Choosing controlled action\n\nHarm is a decision, not an emotion.', category: 'Emotional Accountability', isAdultOnly: true, order: 9 },
+    { title: 'What Is Emotional Accountability?', description: 'Taking responsibility for:\n\n• Your reactions\n• Your behavior\n• The impact of your actions\n\nBlaming others for your impulses weakens self-growth.', category: 'Emotional Accountability', isAdultOnly: true, order: 10 },
+    { title: 'Why Do Some Men Struggle With Boundaries?', description: 'Possible factors:\n\n• Cultural entitlement beliefs\n• Lack of emotional education\n• Exposure to unhealthy models\n• Peer normalization\n\nAwareness allows correction.', category: 'Emotional Accountability', isAdultOnly: true, order: 11 },
+
+    // ── ADULT: HARM PREVENTION ────────────────────────────────────────────────
+    { title: 'What Causes Sexual Violence?', description: 'Sexual violence is influenced by:\n\n• Power imbalance\n• Entitlement mindset\n• Poor impulse control\n• Lack of empathy\n• Substance abuse\n\nIt is never caused by attraction alone.', category: 'Harm Prevention', isAdultOnly: true, order: 12 },
+    { title: 'What Is the Psychological Impact on Victims?', description: 'Victims may experience:\n\n• Trauma\n• Anxiety\n• Depression\n• Long-term trust issues\n\nActions affect lives beyond the moment.', category: 'Harm Prevention', isAdultOnly: true, order: 13 },
+    { title: 'What Are the Legal Consequences?', description: 'Sexual offenses can lead to:\n\n• Criminal charges\n• Imprisonment\n• Social stigma\n• Permanent record\n\nMomentary loss of control can cause lifelong consequences.', category: 'Harm Prevention', isAdultOnly: true, order: 14 },
+
+    // ── ADULT: SELF-REGULATION ────────────────────────────────────────────────
+    { title: 'How Can I Manage Strong Urges?', description: 'Try:\n\n• 5-minute delay rule — wait before acting\n• Deep breathing — slow the nervous system\n• Physical movement — redirect the energy\n• Avoiding known triggers\n• Journaling the feeling without acting on it\n\nUrges peak and pass if not fed.', category: 'Self-Regulation', isAdultOnly: true, order: 15 },
+    { title: 'What Is Real Masculinity?', description: 'Real masculinity is:\n\n• Self-control\n• Respect\n• Emotional strength\n• Protection of others\n• Responsibility\n\nDominance is not masculinity.\nDiscipline is.', category: 'Self-Regulation', isAdultOnly: true, order: 16 },
+    { title: 'Is Seeking Help a Weakness?', description: 'No.\n\nSeeking help shows:\n• Self-awareness\n• Accountability\n• Growth mindset\n\nAvoidance is weakness.\nResponsibility is strength.', category: 'Self-Regulation', isAdultOnly: true, order: 17 },
+    { title: 'Before Acting, Ask Yourself:', description: '• Is this mutual?\n• Is this respectful?\n• Would I accept this behavior toward someone I love?\n• Will I be proud of this decision tomorrow?\n\nPause creates power.\n\nThese four questions can prevent irreversible harm.', category: 'Self-Regulation', isAdultOnly: true, order: 18 },
+
+    // ── NORMAL: HYGIENE ESSENTIALS ────────────────────────────────────────────
+    { title: '🧼 Daily Genital Hygiene', description: 'Why Daily Cleaning Matters:\nDaily hygiene is essential for preventing odor, irritation, and infection. Sweat glands in the groin area are active throughout the day, especially in warm climates. When sweat mixes with natural skin bacteria, it can lead to unpleasant odor and skin discomfort. Regular cleaning reduces bacterial buildup and helps maintain healthy skin balance. Good hygiene also lowers the risk of fungal growth in moist areas.\n\nMaintaining cleanliness is not about appearance — it is about health and comfort.\n\nSafe Washing Practices:\nUse lukewarm water and a mild, fragrance-free cleanser. Harsh soaps can disrupt the natural skin barrier and cause dryness or irritation. Gently clean the external area without excessive scrubbing. Avoid using heavily scented products or antiseptics unless prescribed by a doctor. Cleaning once daily is usually sufficient unless excessive sweating occurs.\n\nDrying Properly:\nMoisture creates an ideal environment for fungal infections. After washing, gently pat the area dry with a clean towel. Avoid rubbing aggressively. Ensure the skin is completely dry before wearing undergarments. If sweating is frequent, consider carrying an extra undergarment during long days.\n\nWhen to Consult a Doctor:\nConsult a healthcare professional if you notice persistent itching, redness, unusual discharge, pain, or strong odor that does not improve with hygiene. Early medical advice prevents complications. Ignoring symptoms may allow minor issues to worsen.', category: 'Hygiene Essentials', isAdultOnly: false, order: 19, imageUrl: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=400&h=300&fit=crop' },
+    { title: '💦 Sweat & Odor Control', description: 'Why Sweating Happens:\nSweating regulates body temperature. The groin and underarm areas have higher sweat gland concentration. Sweat itself is odorless, but bacteria break it down and create odor.\n\nPreventing Odor:\nDaily bathing, trimming excessive hair, and using mild deodorants can help reduce odor. Avoid re-wearing unwashed clothes.\n\nFabric & Clothing Choices:\nCotton and breathable fabrics reduce moisture buildup. Tight synthetic fabrics trap sweat and increase irritation. Choose breathable fabrics like cotton and avoid tight synthetic clothing.\n\nHydration & Diet:\nSpicy foods, alcohol, and dehydration can intensify body odor. Drinking adequate water helps regulate sweat. Stay hydrated and remember that diet and water intake both affect body odor.', category: 'Hygiene Essentials', isAdultOnly: false, order: 20, imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop' },
+    { title: '🍄 Fungal Infection Awareness', description: 'Causes:\nFungal infections develop in warm, moist environments. Poor drying, tight clothing, and excessive sweating increase risk. Fungi grow in warm, moist areas — keeping skin dry is essential.\n\nEarly Symptoms:\nMild itching, redness, and skin irritation may indicate early infection. Early care prevents spread. Watch for itching and redness as these may signal infection.\n\nPrevention:\nKeep the area dry, change clothes daily, use only personal towels. Avoid sharing towels with others.\n\nMedical Care:\nIf symptoms persist for more than a few days, consult a doctor. Over-the-counter creams may help but should be used responsibly. Seek medical advice if symptoms persist longer than a week.', category: 'Hygiene Essentials', isAdultOnly: false, order: 21, imageUrl: 'https://images.unsplash.com/photo-1580281657773-7a6c9f360312?w=400&h=300&fit=crop' },
+    { title: '👕 Undergarment Hygiene', description: 'Daily Change Matters:\nUndergarments absorb sweat and bacteria. Wearing the same pair increases infection risk. Change your undergarments daily without exception.\n\nRecommended Fabrics:\nCotton allows airflow and reduces moisture buildup. Cotton is breathable and safer than synthetic materials.\n\nProper Washing:\nWash in warm water with mild detergent. Ensure they dry completely before use. Dry thoroughly to eliminate any moisture.\n\nAvoid Tight Clothing:\nTight garments trap sweat and cause friction irritation. Wear undergarments that provide proper support without restricting airflow. Avoid tight clothing for better skin health and comfort.', category: 'Hygiene Essentials', isAdultOnly: false, order: 22, imageUrl: 'https://images.unsplash.com/photo-1594938298603-c8148c4dae35?w=400&h=300&fit=crop' },
+    { title: '🧔 Beard Care Basics', description: 'Cleaning Routine:\nWash beard 2–3 times weekly with a mild cleanser. Regular cleaning prevents dirt and oil buildup.\n\nMoisturizing:\nBeard oil prevents dryness and itchiness. Apply after washing to maintain soft, healthy facial hair.\n\nAvoid Beard Dandruff:\nExfoliate gently and hydrate skin beneath the beard. Dead skin accumulation causes dandruff.\n\nSkin Care Underneath:\nHealthy skin supports healthy beard growth. Care for the skin under your beard to promote strong, vibrant growth. A healthy beard starts with healthy skin beneath it.', category: 'Hygiene Essentials', isAdultOnly: false, order: 23, imageUrl: 'https://images.unsplash.com/photo-1633613286991-611bcfb63dba?w=400&h=300&fit=crop' },
+    { title: '✂️ Safe Shaving Practices', description: 'Prepare Skin:\nWash with warm water before shaving to soften hair and open pores.\n\nClean Razors:\nAlways use clean, sharp blades. Dull or dirty blades increase irritation and infection risk.\n\nShave Direction:\nShave in the direction of hair growth to minimize irritation and ingrown hairs.\n\nPost-Shave Care:\nApply alcohol-free soothing lotion or aftershave balm to calm the skin. Avoid products with high alcohol content as they cause additional irritation.', category: 'Hygiene Essentials', isAdultOnly: false, order: 24, imageUrl: 'https://images.unsplash.com/photo-1532364612881-3a6a8aa9b3ae?w=400&h=300&fit=crop' },
+    { title: '🔴 Razor Burn Prevention', description: 'Causes:\nDull blades and dry shaving cause irritation. Razor burn develops when skin friction occurs without proper lubrication. Dull blades increase razor burn and cuts significantly.\n\nPrevention:\nUse shaving cream and apply gentle strokes. Never rush; allow adequate time for careful shaving.\n\nSoothing Skin:\nCool compress and aloe vera can calm irritated skin. Apply immediately after shaving if redness appears.\n\nPause Shaving:\nAllow skin recovery time if irritation occurs. If razor burn is severe, skip shaving for 3–5 days to let skin heal completely.', category: 'Hygiene Essentials', isAdultOnly: false, order: 25, imageUrl: 'https://images.unsplash.com/photo-1570554886111-e80fcca6a029?w=400&h=300&fit=crop' },
+    { title: '✂️ Pubic Trimming Safety', description: 'Hygiene Benefits:\nTrimming may reduce sweat buildup and odor, improving personal comfort and freshness.\n\nSafe Techniques:\nUse clean scissors or electric trimmers carefully. Never use dull tools as they cause pulling and irritation.\n\nClean Tools:\nSanitize grooming tools before and after use. Use rubbing alcohol or boiling water to sterilize. Keep grooming tools clean to prevent infection.\n\nAvoid Irritation:\nAvoid trimming too close to the skin. Trim carefully to avoid cuts and ingrown hairs. Leave adequate space between the blade and skin to prevent injury.', category: 'Hygiene Essentials', isAdultOnly: false, order: 26, imageUrl: 'https://images.unsplash.com/photo-1617634924704-92d37541c1ab?w=400&h=300&fit=crop' },
+  ]
+
+  console.log(`📚 Creating ${modules.length} modules...`)
+  await prisma.moduleProgress.deleteMany({})
+  await prisma.module.deleteMany({})
   for (const mod of modules) {
-    await prisma.module.upsert({
-      where: { id: mod.title }, // using title as fallback; adjust if needed
-      update: {},
-      create: mod,
-    }).catch(() => prisma.module.create({ data: mod }));
+    await prisma.module.create({ data: mod })
+    console.log(`  ✅ [${mod.isAdultOnly ? '🔴 Adult' : '🟦 Normal'}] ${mod.title}`)
   }
-
-  console.log('✅ Seeding complete!');
+  console.log(`\n🎉 Done! 26 normal + 18 adult modules loaded.`)
 }
 
 main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+  .catch((e) => { console.error('❌ Seed failed:', e); process.exit(1) })
+  .finally(async () => { await prisma.$disconnect() })

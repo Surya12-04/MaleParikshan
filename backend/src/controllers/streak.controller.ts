@@ -98,3 +98,55 @@ export const getStreak = async (req: AuthRequest, res: Response, next: NextFunct
     next(err);
   }
 };
+
+export const getStreakStats = async (req: AuthRequest, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const userId = req.user!.userId;
+
+    const streak = await prisma.streak.findUnique({
+      where: { userId },
+      include: {
+        checkins: {
+          orderBy: { date: 'desc' },
+          take: 30,
+        },
+      },
+    });
+
+    if (!streak) {
+      sendError(res, 'No streak tracker found', 404);
+      return;
+    }
+
+    const badges = [
+      { days: 3, label: 'Bronze Badge', icon: '🥉', color: 'bronze', description: 'First Steps' },
+      { days: 7, label: 'Silver Badge', icon: '🥈', color: 'silver', description: 'One Week Strong' },
+      { days: 30, label: 'Gold Badge', icon: '🏆', color: 'gold', description: 'One Month Discipline' },
+      { days: 90, label: 'Diamond Badge', icon: '💎', color: 'diamond', description: 'Three Month Mastery' },
+    ];
+
+    const earnedBadges = badges.filter(
+      (b) => streak.currentStreak >= b.days || streak.longestStreak >= b.days
+    );
+    const nextBadge = badges.find(
+      (b) => streak.currentStreak < b.days && streak.longestStreak < b.days
+    ) || null;
+
+    const stats = {
+      ...streak,
+      badges: {
+        earned: earnedBadges,
+        next: nextBadge,
+        total: badges.length,
+      },
+      progress: {
+        percentage: Math.min((streak.currentStreak / streak.targetDays) * 100, 100),
+        daysRemaining: Math.max(streak.targetDays - streak.currentStreak, 0),
+      },
+    };
+
+    sendSuccess(res, stats, 'Streak stats fetched');
+  } catch (err) {
+    next(err);
+  }
+};

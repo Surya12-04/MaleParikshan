@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { useMode } from "../context/ModeContext";
 
 interface Message {
   id: string;
@@ -9,6 +10,7 @@ interface Message {
 }
 
 const ChatPage = () => {
+  const { isAdultMode } = useMode();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -25,6 +27,37 @@ const ChatPage = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const recognitionRef = useRef<any>(null);
 
+  // Mode-specific configuration
+  const modeConfig = isAdultMode
+    ? {
+        name: "MasterGogo",
+        emoji: "🧘",
+        accent: "#ef4444",
+        gradient: "linear-gradient(135deg, #dc2626 0%, #991b1b 100%)",
+        lightAccent: "rgba(239, 68, 68, 0.1)",
+        description: "Your adult wellness guide. Here to discuss challenges, boundaries, and personal growth with maturity and respect.",
+        suggestedQuestions: [
+          "How to manage impulses and urges?",
+          "Building healthy boundaries",
+          "Understanding consent",
+          "Tips for self-regulation?",
+        ],
+      }
+    : {
+        name: "BaalVeer",
+        emoji: "💪",
+        accent: "#3b82f6",
+        gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        lightAccent: "rgba(59, 130, 246, 0.1)",
+        description: "Your wellness companion. Ask me about fitness, nutrition, mental health, sleep, and building positive habits.",
+        suggestedQuestions: [
+          "How to improve sleep quality?",
+          "Tips for managing stress?",
+          "Building a morning routine",
+          "Healthy eating habits?",
+        ],
+      };
+
   // Theme colors
   const theme = {
     bg: isDarkMode ? "#0f1419" : "#ffffff",
@@ -37,21 +70,14 @@ const ChatPage = () => {
     buttonBg: isDarkMode ? "#f3f4f6" : "#f3f4f6",
     buttonBgHover: isDarkMode ? "rgba(100, 116, 139, 0.4)" : "#e5e7eb",
     aiMessageBg: isDarkMode ? "rgba(255, 255, 255, 0.08)" : "#f3f4f6",
-    userMessageBg: "#667eea",
-    accentColor: "#667eea",
+    userMessageBg: modeConfig.accent,
+    accentColor: modeConfig.accent,
   };
 
   // Save theme preference
   useEffect(() => {
     localStorage.setItem("chatTheme", JSON.stringify(isDarkMode));
   }, [isDarkMode]);
-
-  const suggestedQuestions = [
-    "How to improve sleep quality?",
-    "What is NoFap and its benefits?",
-    "Tips for managing stress and anxiety",
-    "How to build a morning routine?",
-  ];
 
   // Initialize speech recognition
   useEffect(() => {
@@ -275,16 +301,44 @@ const ChatPage = () => {
       <div
         style={{
           background: theme.headerBg,
-          borderBottom: `1px solid ${theme.border}`,
+          borderBottom: `2px solid ${modeConfig.accent}`,
           padding: "16px 24px",
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
         }}
       >
-        <h1 style={{ margin: "0", fontSize: "18px", fontWeight: "600", color: theme.text }}>
-          AI Health Assistant
-        </h1>
+        <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+          <div
+            style={{
+              width: "40px",
+              height: "40px",
+              background: modeConfig.gradient,
+              borderRadius: "12px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "24px",
+              boxShadow: `0 4px 12px ${modeConfig.accent}40`,
+            }}
+          >
+            {modeConfig.emoji}
+          </div>
+          <div>
+            <h1 style={{ margin: "0", fontSize: "18px", fontWeight: "600", color: theme.text }}>
+              {modeConfig.name}
+            </h1>
+            <p
+              style={{
+                margin: "2px 0 0 0",
+                fontSize: "12px",
+                color: theme.textSecondary,
+              }}
+            >
+              {isAdultMode ? "Wellness Coach" : "Your Health Guide"}
+            </p>
+          </div>
+        </div>
         <button
           onClick={() => setIsDarkMode(!isDarkMode)}
           title={isDarkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
@@ -332,24 +386,26 @@ const ChatPage = () => {
           >
             <div
               style={{
-                width: "64px",
-                height: "64px",
-                background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-                borderRadius: "16px",
+                width: "80px",
+                height: "80px",
+                background: modeConfig.gradient,
+                borderRadius: "20px",
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
-                fontSize: "32px",
-                marginBottom: "20px",
+                fontSize: "48px",
+                marginBottom: "24px",
+                boxShadow: `0 8px 24px ${modeConfig.accent}40`,
+                animation: "bounce 2s infinite",
               }}
             >
-              💪
+              {modeConfig.emoji}
             </div>
             <h2 style={{ margin: "0 0 12px 0", fontSize: "24px", fontWeight: "600", color: theme.text }}>
-              AI Health Assistant
+              {modeConfig.name}
             </h2>
-            <p style={{ color: theme.textSecondary, fontSize: "14px", marginBottom: "32px", maxWidth: "400px" }}>
-              Ask me anything about fitness, nutrition, sleep, stress, habits, or overall wellness.
+            <p style={{ color: theme.textSecondary, fontSize: "14px", marginBottom: "32px", maxWidth: "450px" }}>
+              {modeConfig.description}
             </p>
             <div
               style={{
@@ -360,13 +416,13 @@ const ChatPage = () => {
                 width: "100%",
               }}
             >
-              {suggestedQuestions.map((q, idx) => (
+              {modeConfig.suggestedQuestions.map((q, idx) => (
                 <button
                   key={idx}
                   onClick={() => sendMessage(q)}
                   style={{
-                    background: theme.buttonBg,
-                    border: `1px solid ${theme.inputBorder}`,
+                    background: isDarkMode ? "rgba(255,255,255,0.05)" : modeConfig.lightAccent,
+                    border: `1px solid ${modeConfig.accent}40`,
                     color: theme.text,
                     padding: "12px",
                     borderRadius: "12px",
@@ -378,10 +434,12 @@ const ChatPage = () => {
                     transition: "all 0.2s",
                   }}
                   onMouseOver={(e) => {
-                    e.currentTarget.style.background = theme.buttonBgHover;
+                    e.currentTarget.style.background = isDarkMode ? "rgba(255,255,255,0.1)" : modeConfig.lightAccent;
+                    e.currentTarget.style.borderColor = modeConfig.accent;
                   }}
                   onMouseOut={(e) => {
-                    e.currentTarget.style.background = theme.buttonBg;
+                    e.currentTarget.style.background = isDarkMode ? "rgba(255,255,255,0.05)" : modeConfig.lightAccent;
+                    e.currentTarget.style.borderColor = `${modeConfig.accent}40`;
                   }}
                 >
                   {q}
@@ -397,8 +455,27 @@ const ChatPage = () => {
                 marginBottom: "16px",
                 display: "flex",
                 justifyContent: msg.role === "user" ? "flex-end" : "flex-start",
+                alignItems: "flex-end",
+                gap: "8px",
               }}
             >
+              {msg.role === "ai" && (
+                <div
+                  style={{
+                    width: "32px",
+                    height: "32px",
+                    background: modeConfig.gradient,
+                    borderRadius: "8px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "16px",
+                    flexShrink: 0,
+                  }}
+                >
+                  {modeConfig.emoji}
+                </div>
+              )}
               <div
                 style={{
                   maxWidth: "70%",
@@ -456,12 +533,17 @@ const ChatPage = () => {
                   <div
                     style={{
                       background:
-                        msg.role === "user" ? theme.userMessageBg : theme.aiMessageBg,
+                        msg.role === "user" ? modeConfig.accent : (isDarkMode ? "rgba(255, 255, 255, 0.08)" : modeConfig.lightAccent),
                       color: msg.role === "user" ? "white" : theme.text,
                       padding: "12px 16px",
-                      borderRadius: "12px",
+                      borderRadius: msg.role === "user" ? "16px 16px 4px 16px" : "16px 16px 16px 4px",
                       whiteSpace: "pre-wrap",
                       wordWrap: "break-word",
+                      borderLeft: msg.role === "ai" ? `3px solid ${modeConfig.accent}` : "none",
+                      boxShadow:
+                        msg.role === "user"
+                          ? `0 2px 8px ${modeConfig.accent}30`
+                          : "none",
                     }}
                   >
                     {msg.role === "ai" ? formatText(msg.content) : msg.content}
@@ -478,14 +560,22 @@ const ChatPage = () => {
                   <div style={{ display: "flex", gap: "8px", marginTop: "4px" }}>
                     <button
                       onClick={() => speak(msg.content)}
+                      title="Listen to response"
                       style={{
                         background: "transparent",
-                        color: theme.accentColor,
-                        border: `1px solid ${theme.inputBorder}`,
+                        color: modeConfig.accent,
+                        border: `1px solid ${modeConfig.accent}60`,
                         padding: "6px 10px",
                         borderRadius: "6px",
                         cursor: "pointer",
                         fontSize: "12px",
+                        transition: "all 0.2s",
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.background = modeConfig.lightAccent;
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.background = "transparent";
                       }}
                     >
                       🔊
@@ -495,14 +585,22 @@ const ChatPage = () => {
                         navigator.clipboard.writeText(msg.content);
                         alert("Copied!");
                       }}
+                      title="Copy response"
                       style={{
                         background: "transparent",
-                        color: theme.accentColor,
-                        border: `1px solid ${theme.inputBorder}`,
+                        color: modeConfig.accent,
+                        border: `1px solid ${modeConfig.accent}60`,
                         padding: "6px 10px",
                         borderRadius: "6px",
                         cursor: "pointer",
                         fontSize: "12px",
+                        transition: "all 0.2s",
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.background = modeConfig.lightAccent;
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.background = "transparent";
                       }}
                     >
                       📋
@@ -513,14 +611,22 @@ const ChatPage = () => {
                 {msg.role === "user" && !editingId && (
                   <button
                     onClick={() => editMessage(msg.id, msg.content)}
+                    title="Edit message"
                     style={{
                       background: "transparent",
-                      color: theme.accentColor,
+                      color: modeConfig.accent,
                       border: "none",
                       padding: "4px 0",
                       cursor: "pointer",
                       fontSize: "12px",
                       textAlign: "left",
+                      transition: "all 0.2s",
+                    }}
+                    onMouseOver={(e) => {
+                      e.currentTarget.style.opacity = "0.7";
+                    }}
+                    onMouseOut={(e) => {
+                      e.currentTarget.style.opacity = "1";
                     }}
                   >
                     ✏️ Edit
@@ -532,34 +638,50 @@ const ChatPage = () => {
         )}
 
         {loading && (
-          <div style={{ display: "flex", gap: "6px", marginTop: "16px" }}>
+          <div style={{ display: "flex", gap: "6px", marginTop: "16px", alignItems: "flex-end" }}>
             <div
               style={{
-                width: "8px",
-                height: "8px",
-                borderRadius: "50%",
-                background: theme.accentColor,
-                animation: "pulse 1.5s infinite",
+                width: "32px",
+                height: "32px",
+                background: modeConfig.gradient,
+                borderRadius: "8px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: "16px",
               }}
-            />
-            <div
-              style={{
-                width: "8px",
-                height: "8px",
-                borderRadius: "50%",
-                background: theme.accentColor,
-                animation: "pulse 1.5s infinite 0.2s",
-              }}
-            />
-            <div
-              style={{
-                width: "8px",
-                height: "8px",
-                borderRadius: "50%",
-                background: theme.accentColor,
-                animation: "pulse 1.5s infinite 0.4s",
-              }}
-            />
+            >
+              {modeConfig.emoji}
+            </div>
+            <div style={{ display: "flex", gap: "4px" }}>
+              <div
+                style={{
+                  width: "8px",
+                  height: "8px",
+                  borderRadius: "50%",
+                  background: modeConfig.accent,
+                  animation: "pulse 1.5s infinite",
+                }}
+              />
+              <div
+                style={{
+                  width: "8px",
+                  height: "8px",
+                  borderRadius: "50%",
+                  background: modeConfig.accent,
+                  animation: "pulse 1.5s infinite 0.2s",
+                }}
+              />
+              <div
+                style={{
+                  width: "8px",
+                  height: "8px",
+                  borderRadius: "50%",
+                  background: modeConfig.accent,
+                  animation: "pulse 1.5s infinite 0.4s",
+                }}
+              />
+            </div>
           </div>
         )}
 
@@ -577,7 +699,7 @@ const ChatPage = () => {
         {selectedFile && (
           <div
             style={{
-              background: theme.buttonBg,
+              background: modeConfig.lightAccent,
               padding: "8px 12px",
               borderRadius: "8px",
               marginBottom: "12px",
@@ -586,6 +708,7 @@ const ChatPage = () => {
               alignItems: "center",
               fontSize: "12px",
               color: theme.text,
+              border: `1px solid ${modeConfig.accent}40`,
             }}
           >
             📎 {selectedFile.name}
@@ -601,7 +724,7 @@ const ChatPage = () => {
         <div style={{ display: "flex", gap: "12px", alignItems: "flex-end" }}>
           <input
             type="text"
-            placeholder="Ask me anything..."
+            placeholder={`Ask ${modeConfig.name}...`}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => {
@@ -620,6 +743,13 @@ const ChatPage = () => {
               outline: "none",
               background: theme.inputBg,
               color: theme.text,
+              transition: "border-color 0.2s",
+            }}
+            onFocus={(e) => {
+              e.currentTarget.style.borderColor = modeConfig.accent;
+            }}
+            onBlur={(e) => {
+              e.currentTarget.style.borderColor = theme.inputBorder;
             }}
           />
 
@@ -633,6 +763,13 @@ const ChatPage = () => {
               borderRadius: "8px",
               cursor: "pointer",
               fontSize: "16px",
+              transition: "all 0.2s",
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.background = theme.buttonBgHover;
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.background = theme.buttonBg;
             }}
           >
             📎
@@ -642,13 +779,25 @@ const ChatPage = () => {
             onClick={toggleVoiceInput}
             title={isListening ? "Stop recording" : "Start recording"}
             style={{
-              background: isListening ? theme.accentColor : theme.buttonBg,
+              background: isListening ? modeConfig.accent : theme.buttonBg,
               border: isListening ? "none" : `1px solid ${theme.inputBorder}`,
               color: isListening ? "white" : theme.text,
               padding: "10px 12px",
               borderRadius: "8px",
               cursor: "pointer",
               fontSize: "16px",
+              transition: "all 0.2s",
+              boxShadow: isListening ? `0 4px 12px ${modeConfig.accent}40` : "none",
+            }}
+            onMouseOver={(e) => {
+              if (!isListening) {
+                e.currentTarget.style.background = theme.buttonBgHover;
+              }
+            }}
+            onMouseOut={(e) => {
+              if (!isListening) {
+                e.currentTarget.style.background = theme.buttonBg;
+              }
             }}
           >
             🎙️
@@ -659,7 +808,7 @@ const ChatPage = () => {
             disabled={!input.trim() || loading}
             style={{
               background:
-                input.trim() && !loading ? theme.accentColor : theme.inputBorder,
+                input.trim() && !loading ? modeConfig.accent : theme.inputBorder,
               color: "white",
               border: "none",
               padding: "10px 16px",
@@ -667,6 +816,19 @@ const ChatPage = () => {
               cursor: input.trim() && !loading ? "pointer" : "not-allowed",
               fontSize: "14px",
               fontWeight: "600",
+              transition: "all 0.2s",
+              boxShadow:
+                input.trim() && !loading
+                  ? `0 4px 12px ${modeConfig.accent}40`
+                  : "none",
+            }}
+            onMouseOver={(e) => {
+              if (input.trim() && !loading) {
+                e.currentTarget.style.opacity = "0.9";
+              }
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.opacity = "1";
             }}
           >
             {loading ? "..." : "Send"}
@@ -689,6 +851,10 @@ const ChatPage = () => {
         @keyframes pulse {
           0%, 100% { opacity: 0.4; }
           50% { opacity: 1; }
+        }
+        @keyframes bounce {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-8px); }
         }
         ::-webkit-scrollbar {
           width: 8px;

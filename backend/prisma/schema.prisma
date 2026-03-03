@@ -117,6 +117,7 @@ model Module {
   category    String
   isAdultOnly Boolean @default(false)
   order       Int     @default(0)
+  imageUrl    String?
   createdAt   DateTime @default(now())
 
   progress ModuleProgress[]

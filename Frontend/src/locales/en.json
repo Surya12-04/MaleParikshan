@@ -6,7 +6,8 @@
   "nav": {
     "dashboard": "Dashboard",
     "modules": "Modules",
-    "streak": "Streak",
+    "dailygoal": "Daily Goals",
+    "streak": "NoFap Tracker",
     "mood": "Mood",
     "chat": "AI Chat",
     "profile": "Profile",
@@ -34,6 +35,19 @@
     "goals": "Your Goals",
     "submit": "Calculate & Continue"
   },
+  "dailygoal": {
+    "title": "Daily Goals",
+    "subtitle": "Set your goals for today. Complete them. Build momentum.",
+    "progress": "Today's Progress",
+    "addGoal": "Add a new goal for today...",
+    "add": "Add",
+    "noGoals": "No Goals Yet",
+    "noGoalsDesc": "Add a goal above to get started with your day",
+    "tips": "💡 Tips for Success",
+    "tip1": "Set 3-5 realistic goals per day for best results",
+    "tip2": "Complete easier goals first to build momentum",
+    "tip3": "Your goals reset daily—focus on today, not tomorrow"
+  },
   "dashboard": {
     "title": "Your Dashboard",
     "healthScore": "Health Score",
@@ -49,7 +63,7 @@
     "loginStreak": "Login Streak"
   },
   "streak": {
-    "title": "Streak Tracker",
+    "title": "NoFap Tracker",
     "current": "Current Streak",
     "longest": "Longest Streak",
     "target": "Target",
@@ -57,9 +71,23 @@
     "consistent": "Stayed Consistent",
     "resisted": "Resisted Urges",
     "relapsed": "Relapsed",
-    "setup": "Setup Your Streak",
-    "targetDays": "Target Days",
-    "start": "Start Tracking"
+    "setup": "Setup Your NoFap Tracker",
+    "targetDays": "Choose Your Target",
+    "start": "Begin Journey",
+    "subtitle": "Self-control through discipline. Freedom through consistency.",
+    "progressLabel": "Progress Toward Goal",
+    "daysRemaining": "days remaining",
+    "checkInQuestion": "How was today? Be honest with yourself.",
+    "alreadyCheckedIn": "✓ Check-in complete for today",
+    "comeBackTomorrow": "Come back tomorrow to continue your journey.",
+    "badges": "🏆 Earned Badges",
+    "nextMilestone": "Next Milestone",
+    "lastDays": "Last 30 Days Activity",
+    "remember": "💡 Remember",
+    "fact1": "Every day you don't relapse strengthens your neural pathways of self-control.",
+    "fact2": "Urges are temporary. Discipline is permanent.",
+    "fact3": "If you relapse, it's not failure—it's data. Learn and restart immediately.",
+    "activityDescription": "Green blocks = days you stayed consistent. Empty blocks = reset days or before streak started."
   },
   "mood": {
     "title": "Mood Tracker",
@@ -91,6 +119,13 @@
     "cancel": "Cancel",
     "ageRestricted": "You must be 18 or older to access this section.",
     "enabled": "Adult Mode Enabled"
+  },
+  "mode": {
+    "switching": "Switching mode...",
+    "switchToAdult": "Switching to Adult Mode",
+    "switchToNormal": "Switching to Normal Mode",
+    "loadingAdultContent": "Loading adult content...",
+    "loadingNormalContent": "Switching to standard content..."
   },
   "common": {
     "loading": "Loading...",
