@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useMode } from "../context/ModeContext";
+import { useTranslation } from "../hooks/useTranslation";
 import { chatService } from "../services/chatService";
 
 interface Message {
@@ -12,6 +13,7 @@ interface Message {
 
 const ChatPage = () => {
   const { isAdultMode } = useMode();
+  const { t } = useTranslation();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -29,35 +31,21 @@ const ChatPage = () => {
   const recognitionRef = useRef<any>(null);
 
   // Mode-specific configuration
-  const modeConfig = isAdultMode
-    ? {
-        name: "MasterGogo",
-        emoji: "🧘",
-        accent: "#ef4444",
-        gradient: "linear-gradient(135deg, #dc2626 0%, #991b1b 100%)",
-        lightAccent: "rgba(239, 68, 68, 0.1)",
-        description: "Your adult wellness guide. Here to discuss challenges, boundaries, and personal growth with maturity and respect.",
-        suggestedQuestions: [
-          "How to manage impulses and urges?",
-          "Building healthy boundaries",
-          "Understanding consent",
-          "Tips for self-regulation?",
-        ],
-      }
-    : {
-        name: "BaalVeer",
-        emoji: "💪",
-        accent: "#3b82f6",
-        gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-        lightAccent: "rgba(59, 130, 246, 0.1)",
-        description: "Your wellness companion. Ask me about fitness, nutrition, mental health, sleep, and building positive habits.",
-        suggestedQuestions: [
-          "How to improve sleep quality?",
-          "Tips for managing stress?",
-          "Building a morning routine",
-          "Healthy eating habits?",
-        ],
-      };
+  const modeKey = isAdultMode ? 'chat.adultMode' : 'chat.normalMode'
+  const modeConfig = {
+    name: t(`${modeKey}.name`),
+    emoji: isAdultMode ? "🧘" : "💪",
+    accent: isAdultMode ? "#ef4444" : "#3b82f6",
+    gradient: isAdultMode ? "linear-gradient(135deg, #dc2626 0%, #991b1b 100%)" : "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+    lightAccent: isAdultMode ? "rgba(239, 68, 68, 0.1)" : "rgba(59, 130, 246, 0.1)",
+    description: t(`${modeKey}.subtitle`),
+    suggestedQuestions: [
+      t(`${modeKey}.suggestions.0`),
+      t(`${modeKey}.suggestions.1`),
+      t(`${modeKey}.suggestions.2`),
+      t(`${modeKey}.suggestions.3`),
+    ],
+  };
 
   // Theme colors
   const theme = {

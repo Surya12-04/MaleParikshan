@@ -19,6 +19,7 @@ import moodRoutes from './routes/mood.routes';
 import moduleRoutes from './routes/module.routes';
 import chatRoutes from './routes/chat.routes';
 import dashboardRoutes from './routes/dashboard.routes';
+import translateRoutes from './routes/translate.routes';
 
 const app = express();
 
@@ -53,6 +54,7 @@ app.use('/mood', moodRoutes);
 app.use('/modules', moduleRoutes);
 app.use('/chat', chatRoutes);
 app.use('/dashboard', dashboardRoutes);
+app.use('/', translateRoutes);
 
 // ── Error Handling ──────────────────────────────────────────────────────────
 app.use(notFound);

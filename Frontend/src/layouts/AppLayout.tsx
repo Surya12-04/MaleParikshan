@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useMode } from '../context/ModeContext'
+import { useLanguage } from '../context/LanguageContext'
 import { adultService } from '../services/adultService'
 import { useTranslation } from '../hooks/useTranslation'
 import BottomNav from '../components/BottomNav'
@@ -17,6 +18,7 @@ const navItems = [
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, logout, updateUser } = useAuth()
   const { isAdultMode, toggleMode, showGate, setShowGate, isSwitching } = useMode()
+  const { language, setLanguage } = useLanguage()
   const { t } = useTranslation()
   const location = useLocation()
   const navigate = useNavigate()
@@ -251,6 +253,45 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 </div>
                 <span>{isAdultMode ? '🔞 Adult Mode' : '📖 Normal Mode'}</span>
               </button>
+            </div>
+
+            {/* ── Language Toggle ────────────────────────────────────────── */}
+            <div className="pt-3 mt-2" style={{ borderTop: '1px solid var(--color-border)' }}>
+              <p className="text-xs font-body px-4 mb-2 uppercase tracking-widest" style={{ color: 'var(--color-muted)', opacity: 0.6 }}>
+                Language
+              </p>
+              <div className="flex gap-2 px-4">
+                <button
+                  onClick={() => setLanguage('en')}
+                  className="flex-1 py-2 px-3 rounded-lg font-display font-medium text-sm transition-all duration-300"
+                  style={language === 'en' ? {
+                    background: 'var(--color-primary)',
+                    color: 'white',
+                    border: '1px solid var(--color-primary)',
+                  } : {
+                    background: 'var(--color-elevated)',
+                    color: 'var(--color-muted)',
+                    border: '1px solid var(--color-border)',
+                  }}
+                >
+                  English
+                </button>
+                <button
+                  onClick={() => setLanguage('hi')}
+                  className="flex-1 py-2 px-3 rounded-lg font-display font-medium text-sm transition-all duration-300"
+                  style={language === 'hi' ? {
+                    background: 'var(--color-primary)',
+                    color: 'white',
+                    border: '1px solid var(--color-primary)',
+                  } : {
+                    background: 'var(--color-elevated)',
+                    color: 'var(--color-muted)',
+                    border: '1px solid var(--color-border)',
+                  }}
+                >
+                  हिंदी
+                </button>
+              </div>
             </div>
           </nav>
 

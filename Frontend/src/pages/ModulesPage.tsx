@@ -3,6 +3,7 @@ import { modulesService } from '../services/modulesService'
 import { adultService } from '../services/adultService'
 import { useAuth } from '../context/AuthContext'
 import { useMode } from '../context/ModeContext'
+import { useTranslation } from '../hooks/useTranslation'
 import type { Module } from '../types'
 
 // ── Normal mode styles (blue/teal - warm, educational) ────────────────────────
@@ -36,6 +37,7 @@ const ADULT_EMOJI: Record<string, string> = {
 }
 
 export default function ModulesPage() {
+  const { t } = useTranslation()
   const { user, updateUser } = useAuth()
   const { isAdultMode, toggleMode, setShowGate: setModeGate } = useMode()
   const [allModules, setAllModules] = useState<Module[]>([])
@@ -224,7 +226,7 @@ export default function ModulesPage() {
         <div>
           <div className="flex items-center gap-3 mb-1">
             <h1 className={`font-display text-3xl font-bold transition-all duration-500 ${isAdultMode ? 'text-red-100' : 'text-white'}`}>
-              {isAdultMode ? 'Adult Learning Hub' : 'Knowledge Hub'}
+              {isAdultMode ? t('modules.adultHub') : t('modules.knowledgeHub')}
             </h1>
             {isAdultMode && (
               <span className="text-xs px-2 py-0.5 rounded-full font-body" style={{ background: 'rgba(185,28,28,0.2)', border: '1px solid rgba(185,28,28,0.4)', color: '#fca5a5' }}>
@@ -233,7 +235,7 @@ export default function ModulesPage() {
             )}
           </div>
           <p className="text-muted font-body text-sm">
-            {isAdultMode ? 'Consent · Accountability · Self-Regulation' : 'Swipe cards or use arrows · Tap dots to jump'}
+            {isAdultMode ? t('modules.adultSubtitle') : t('modules.normalSubtitle')}
           </p>
         </div>
       </div>
@@ -304,8 +306,8 @@ export default function ModulesPage() {
       {modules.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-20 gap-3">
           <p className="text-4xl">📚</p>
-          <p className="font-display text-lg font-bold text-white">No modules yet</p>
-          <p className="text-muted text-sm font-body">Run <code className="text-accent bg-surface px-2 py-0.5 rounded">npm run seed</code> in backend</p>
+          <p className="font-display text-lg font-bold text-white">{t('modules.noModules')}</p>
+          <p className="text-muted text-sm font-body">Run <code className="text-accent bg-surface px-2 py-0.5 rounded">npm run seed</code> {t('modules.runSeed')}</p>
         </div>
       ) : (
         <div className="relative pb-2">

@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { ModeProvider } from './context/ModeContext'
+import { LanguageProvider } from './context/LanguageContext'
 import AppRouter from './routes/AppRouter'  // ← fixed: routes not router
 import './index.css'
 
@@ -11,7 +12,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <BrowserRouter>
       <AuthProvider>
         <ModeProvider>
-          <AppRouter />
+          <LanguageProvider>
+            <AppRouter />
+          </LanguageProvider>
         </ModeProvider>
       </AuthProvider>
     </BrowserRouter>

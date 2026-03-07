@@ -91,15 +91,39 @@
   },
   "mood": {
     "title": "Mood Tracker",
+    "subtitle": "Track your emotional state daily",
     "logToday": "How are you feeling today?",
+    "selectMood": "Select your current mood",
     "alreadyLogged": "Mood logged for today",
+    "logSuccess": "Mood logged successfully!",
+    "comeTomorrow": "Come back tomorrow to log again.",
+    "logButton": "Log Mood",
+    "logging": "Logging...",
     "report": "Weekly Report",
-    "distribution": "Mood Distribution"
+    "distribution": "Mood Distribution",
+    "weeklyTrend": "Weekly Trend",
+    "mostCommonMood": "Most Common Mood",
+    "dominantState": "This has been your dominant emotional state",
+    "noMoodData": "No mood data yet",
+    "logFirstMood": "Log your first mood above!",
+    "logDailyTrends": "Log moods daily to see trends!",
+    "moodLabels": {
+      "calm": "Calm",
+      "confident": "Confident",
+      "neutral": "Neutral",
+      "low": "Low",
+      "angry": "Angry"
+    }
   },
   "modules": {
     "title": "Learning Modules",
     "learnToday": "Learn Today",
     "knowledgeHub": "Knowledge Hub",
+    "adultHub": "Adult Learning Hub",
+    "normalSubtitle": "Swipe cards or use arrows · Tap dots to jump",
+    "adultSubtitle": "Consent · Accountability · Self-Regulation",
+    "noModules": "No modules yet",
+    "runSeed": "Run npm run seed in backend",
     "completed": "Completed",
     "markComplete": "Mark as Complete",
     "duration": "Duration"
@@ -108,7 +132,51 @@
     "title": "AI Chat",
     "placeholder": "Ask me anything about men's health...",
     "send": "Send",
-    "thinking": "Thinking..."
+    "thinking": "Thinking...",
+    "normalMode": {
+      "name": "BaalVeer",
+      "description": "Your Health Guide",
+      "subtitle": "Your wellness companion. Ask me about fitness, nutrition, mental health, sleep, and building positive habits.",
+      "suggestions": [
+        "How to improve sleep quality?",
+        "Tips for managing stress?",
+        "Building a morning routine",
+        "Healthy eating habits?"
+      ]
+    },
+    "adultMode": {
+      "name": "MasterGogo",
+      "description": "Your Adult Wellness Guide",
+      "subtitle": "Your adult wellness guide. Here to discuss challenges, boundaries, and personal growth with maturity and respect.",
+      "suggestions": [
+        "How to manage impulses and urges?",
+        "Building healthy boundaries",
+        "Understanding consent",
+        "Tips for self-regulation?"
+      ]
+    }
+  },
+  "facts": {
+    "normalMode": [
+      "Laughing can increase blood flow by 20%, improving cardiovascular function. So, laughter really can be good medicine!",
+      "Men who talk about their emotions have 23% lower stress levels than those who suppress them.",
+      "Exercise increases serotonin production by up to 300%, naturally improving mood and reducing depression.",
+      "Quality sleep improves emotional regulation. Men sleeping 7-9 hours process emotions 40% better.",
+      "Deep breathing activates the parasympathetic nervous system, reducing stress hormones within 5 minutes.",
+      "Social connections reduce mortality risk by 50% — talking to friends is medicine for the mind.",
+      "Practicing gratitude daily increases dopamine and serotonin levels, improving overall mental health.",
+      "Cold water exposure can reduce anxiety and boost resilience by activating the body's stress response system."
+    ],
+    "adultMode": [
+      "Pornography consumption can reduce dopamine sensitivity over time, affecting motivation and satisfaction in real-world relationships.",
+      "Poor impulse control often stems from weak prefrontal cortex activation — practice delays strengthen decision-making.",
+      "Consent violations damage not only victims but also perpetrators' long-term psychological health and relationships.",
+      "Accountability for one's actions triggers neuroplasticity — the brain rewires through conscious behavioral change.",
+      "Emotional regulation skills reduce harmful behaviors by 70% — that's why self-awareness saves lives.",
+      "Boundary violations often escalate — respecting limits in small moments prevents serious harm later.",
+      "Self-control is like a muscle — exercising it daily strengthens willpower and reduces impulsive behavior.",
+      "Genuine intimacy requires vulnerability and trust — neither can exist without respect and consent."
+    ]
   },
   "adult": {
     "title": "Adult Mode",

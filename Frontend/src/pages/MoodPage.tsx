@@ -5,11 +5,11 @@ import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis
 import { useTranslation } from '../hooks/useTranslation'
 
 const MOODS = [
-  { type: 'calm' as MoodType,      emoji: '😌', label: 'Calm' },
-  { type: 'confident' as MoodType, emoji: '💪', label: 'Confident' },
-  { type: 'neutral' as MoodType,   emoji: '😐', label: 'Neutral' },
-  { type: 'low' as MoodType,       emoji: '😔', label: 'Low' },
-  { type: 'angry' as MoodType,     emoji: '😠', label: 'Angry' },
+  { type: 'calm' as MoodType,      emoji: '😌', labelKey: 'mood.moodLabels.calm' },
+  { type: 'confident' as MoodType, emoji: '💪', labelKey: 'mood.moodLabels.confident' },
+  { type: 'neutral' as MoodType,   emoji: '😐', labelKey: 'mood.moodLabels.neutral' },
+  { type: 'low' as MoodType,       emoji: '😔', labelKey: 'mood.moodLabels.low' },
+  { type: 'angry' as MoodType,     emoji: '😠', labelKey: 'mood.moodLabels.angry' },
 ]
 
 const MOOD_COLORS: Record<MoodType, string> = {
@@ -77,7 +77,7 @@ export default function MoodPage() {
     <div className="space-y-8 animate-fade-up">
       <div>
         <h1 className="font-display text-3xl font-bold text-white mb-2">{t('mood.title')}</h1>
-        <p className="text-muted font-body text-sm">Track your emotional state daily</p>
+        <p className="text-muted font-body text-sm">{t('mood.subtitle')}</p>
       </div>
 
       {/* Daily log */}
@@ -89,12 +89,12 @@ export default function MoodPage() {
         {logged ? (
           <div className="text-center py-8">
             <p className="text-5xl mb-4">{MOODS.find(m => m.type === selectedMood)?.emoji}</p>
-            <p className="font-display text-lg font-semibold text-teal">Mood logged successfully!</p>
-            <p className="text-muted text-sm font-body mt-2">Come back tomorrow to log again.</p>
+            <p className="font-display text-lg font-semibold text-teal">{t('mood.logSuccess')}</p>
+            <p className="text-muted text-sm font-body mt-2">{t('mood.comeTomorrow')}</p>
           </div>
         ) : (
           <>
-            <p className="text-muted text-sm font-body mb-6">Select your current mood</p>
+            <p className="text-muted text-sm font-body mb-6">{t('mood.selectMood')}</p>
             <div className="grid grid-cols-5 gap-2 mb-6">
               {MOODS.map((m) => (
                 <button
@@ -107,7 +107,7 @@ export default function MoodPage() {
                   }`}
                 >
                   <span className="text-3xl">{m.emoji}</span>
-                  <span className="text-xs font-body text-muted">{m.label}</span>
+                  <span className="text-xs font-body text-muted">{t(m.labelKey)}</span>
                 </button>
               ))}
             </div>
@@ -119,7 +119,7 @@ export default function MoodPage() {
               disabled={!selectedMood || loading}
               className="btn-primary py-4 px-8 disabled:opacity-50"
             >
-              {loading ? 'Logging...' : 'Log Mood'}
+              {loading ? t('mood.logging') : t('mood.logButton')}
             </button>
           </>
         )}
@@ -176,8 +176,8 @@ export default function MoodPage() {
               ) : (
                 <div className="text-center py-8">
                   <p className="text-3xl mb-2">😶</p>
-                  <p className="text-muted text-sm font-body">No mood data yet</p>
-                  <p className="text-muted text-xs font-body mt-1">Log your first mood above!</p>
+                  <p className="text-muted text-sm font-body">{t('mood.noMoodData')}</p>
+                  <p className="text-muted text-xs font-body mt-1">{t('mood.logFirstMood')}</p>
                 </div>
               )}
             </div>
@@ -185,7 +185,7 @@ export default function MoodPage() {
             {/* Bar chart */}
             <div className="card">
               <h3 className="font-display text-sm font-semibold text-muted uppercase tracking-widest mb-4">
-                Weekly Trend
+                {t('mood.weeklyTrend')}
               </h3>
               {barData.length > 0 ? (
                 <ResponsiveContainer width="100%" height={200}>
@@ -211,8 +211,8 @@ export default function MoodPage() {
               ) : (
                 <div className="text-center py-8">
                   <p className="text-3xl mb-2">📊</p>
-                  <p className="text-muted text-sm font-body">No trend data yet</p>
-                  <p className="text-muted text-xs font-body mt-1">Log moods daily to see trends!</p>
+                  <p className="text-muted text-sm font-body">{t('mood.noMoodData')}</p>
+                  <p className="text-muted text-xs font-body mt-1">{t('mood.logDailyTrends')}</p>
                 </div>
               )}
             </div>
@@ -221,7 +221,7 @@ export default function MoodPage() {
             {report?.dominantMood && pieData.length > 0 && (
               <div className="col-span-2 card border-gradient">
                 <p className="text-muted text-xs font-body uppercase tracking-widest mb-2">
-                  Most Common Mood
+                  {t('mood.mostCommonMood')}
                 </p>
                 <div className="flex items-center gap-4">
                   <span className="text-4xl">
@@ -232,7 +232,7 @@ export default function MoodPage() {
                       {report.dominantMood}
                     </p>
                     <p className="text-muted text-sm font-body">
-                      This has been your dominant emotional state
+                      {t('mood.dominantState')}
                     </p>
                   </div>
                 </div>

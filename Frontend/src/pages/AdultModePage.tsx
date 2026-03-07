@@ -154,7 +154,7 @@ export default function AdultModePage() {
   const [flipped, setFlipped] = useState<{ [key: number]: boolean }>({})
 
   // Age gate
-  if (!user || user.age < 18) {
+  if (!user || !user.age || user.age < 18) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] text-center animate-fade-up">
         <div className="text-5xl mb-6">🔒</div>
